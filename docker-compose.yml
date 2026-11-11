@@ -1,0 +1,33 @@
+# Self-hosted stack: PostgreSQL 16 + the NestJS API (Prisma migrations on boot).
+# The web app is a static Next.js export; run `npm run dev:web` against the API, or
+# open the Firebase demo which runs the same domain services in the browser.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: erp
+      POSTGRES_PASSWORD: erp
+      POSTGRES_DB: enterprise_erp
+    ports: ["5432:5432"]
+    volumes: [pg-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erp -d enterprise_erp"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://erp:erp@postgres:5432/enterprise_erp
+      JWT_SECRET: ${JWT_SECRET:-local-compose-secret-change-me-local-compose}
+      SEED_DEMO: "true"
+      LLM_PROVIDER: mock
+      PORT: "3000"
+    ports: ["3000:3000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+volumes:
+  pg-data:

@@ -1,0 +1,165 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id
+  name      String
+  country   String
+  currency  String   @default("AED")
+  users     User[]
+  invoices  Invoice[]
+  leave     LeaveRequest[]
+  balances  LeaveBalance[]
+  pos       PurchaseOrder[]
+  audit     AuditEntry[]
+}
+
+model User {
+  id           String  @id
+  tenantId     String
+  email        String  @unique
+  displayName  String
+  title        String?
+  roles        String[]
+  passwordHash String
+  active       Boolean @default(true)
+  tenant       Tenant  @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+}
+
+model Invoice {
+  id           String        @id
+  tenantId     String
+  number       String
+  vendorName   String
+  issueDate    String
+  dueDate      String
+  currency     String        @default("AED")
+  taxBps       Int           @default(500)
+  status       String
+  notes        String?
+  submittedBy  String?
+  approvedBy   String?
+  rejectedBy   String?
+  rejectReason String?
+  paidAt       String?
+  paidBy       String?
+  version      Int           @default(1)
+  createdAt    String
+  updatedAt    String
+  lines        InvoiceLine[]
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status])
+}
+
+model InvoiceLine {
+  id             String  @id
+  invoiceId      String
+  description    String
+  quantity       Int
+  unitPriceMinor Int
+  invoice        Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model LeaveRequest {
+  id           String  @id
+  tenantId     String
+  employeeId   String
+  employeeName String
+  type         String
+  from         String
+  to           String
+  days         Int
+  reason       String?
+  status       String
+  submittedBy  String?
+  approvedBy   String?
+  rejectedBy   String?
+  rejectReason String?
+  version      Int     @default(1)
+  createdAt    String
+  updatedAt    String
+  tenant       Tenant  @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, employeeId])
+  @@index([tenantId, status])
+}
+
+model LeaveBalance {
+  tenantId             String
+  employeeId           String
+  year                 Int
+  annualAllowanceDays  Int
+  annualUsedDays       Int
+  tenant               Tenant @relation(fields: [tenantId], references: [id])
+
+  @@id([tenantId, employeeId, year])
+}
+
+model PurchaseOrder {
+  id           String   @id
+  tenantId     String
+  number       String
+  vendorName   String
+  neededBy     String?
+  currency     String   @default("AED")
+  taxBps       Int      @default(500)
+  status       String
+  notes        String?
+  submittedBy  String?
+  approvedBy   String?
+  rejectedBy   String?
+  rejectReason String?
+  issuedAt     String?
+  issuedBy     String?
+  version      Int      @default(1)
+  createdAt    String
+  updatedAt    String
+  lines        PoLine[]
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status])
+}
+
+model PoLine {
+  id             String        @id
+  poId           String
+  description    String
+  quantity       Int
+  unitPriceMinor Int
+  po             PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+}
+
+model AuditEntry {
+  id         String  @id
+  tenantId   String
+  at         String
+  actorId    String
+  actorName  String
+  action     String
+  entityType String
+  entityId   String
+  summary    String
+  before     Json?
+  after      Json?
+  tenant     Tenant  @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, at])
+  @@index([tenantId, entityType, entityId])
+}
+
+model Sequence {
+  key   String @id
+  value Int
+}

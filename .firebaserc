@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "mo-magd"
+  },
+  "targets": {
+    "mo-magd": {
+      "hosting": {
+        "demo": [
+          "enterprise-erp-ai-poc"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

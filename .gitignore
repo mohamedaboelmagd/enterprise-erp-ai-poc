@@ -1,0 +1,14 @@
+node_modules/
+dist/
+out/
+.next/
+.firebase/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
+firebase-debug.log*
+.DS_Store
+*.tsbuildinfo
+.prisma-client/

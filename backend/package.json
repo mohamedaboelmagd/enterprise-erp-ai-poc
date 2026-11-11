@@ -1,0 +1,46 @@
+{
+  "name": "enterprise-erp-ai-services",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-hosted multi-tenant ERP services: finance, HR, procurement and a pluggable AI assistant — NestJS + Prisma/PostgreSQL",
+  "scripts": {
+    "build": "nest build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "jest",
+    "test:unit": "jest test/unit",
+    "test:api": "jest test/api",
+    "dev": "nest start --watch",
+    "start": "node dist/main.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "postinstall": "prisma generate"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/jwt": "^11.0.1",
+    "@nestjs/platform-express": "^11.1.9",
+    "@nestjs/swagger": "^11.2.3",
+    "@prisma/client": "^6.19.1",
+    "helmet": "^8.3.0",
+    "prisma": "^6.19.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.14",
+    "@nestjs/testing": "^11.1.9",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.5",
+    "typescript": "~5.9.3"
+  }
+}
