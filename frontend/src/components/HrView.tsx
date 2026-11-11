@@ -24,7 +24,7 @@ export function HrView() {
       setSelected((cur) => cur ?? list[0]?.id ?? null);
       setBalance(await platform.hr.getBalance(actor));
     })();
-  }, [platform, actor, tick]);
+  }, [platform, persona, tick]);
 
   const current = rows.find((r) => r.id === selected);
   const canApprove = actorCan(actor, "hr:approve");

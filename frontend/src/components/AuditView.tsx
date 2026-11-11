@@ -12,7 +12,7 @@ export function AuditView() {
   useEffect(() => {
     if (!platform) return;
     void platform.audit.list(actor, { limit: 100 }).then(setRows);
-  }, [platform, actor, tick]);
+  }, [platform, persona, tick]);
 
   return (
     <div className="pad">

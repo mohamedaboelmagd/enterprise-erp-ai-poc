@@ -51,4 +51,20 @@ describe("demo shell", () => {
     await user.click(screen.getByTestId("invoice-INV-2026-0002"));
     expect(screen.queryByTestId("approve-invoice")).not.toBeInTheDocument();
   });
+
+  it("settles after loading and does not keep refetching dashboard data", async () => {
+    await ready();
+    await waitFor(() => expect(screen.getByTestId("kpi-overdue")).toHaveTextContent("1"));
+    // Let any in-flight load finish, then assert the effect does not retrigger itself.
+    await new Promise((r) => setTimeout(r, 50));
+    const platform = useDemo.getState().platform;
+    expect(platform).toBeTruthy();
+    const financeList = jest.spyOn(platform!.finance, "list");
+    const hrList = jest.spyOn(platform!.hr, "list");
+    await new Promise((r) => setTimeout(r, 200));
+    expect(financeList).not.toHaveBeenCalled();
+    expect(hrList).not.toHaveBeenCalled();
+    financeList.mockRestore();
+    hrList.mockRestore();
+  });
 });

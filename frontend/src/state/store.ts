@@ -95,8 +95,15 @@ export const useDemo = create<DemoState>((set, get) => ({
   },
 }));
 
+const actorCache = new Map<PersonaKey, Actor>();
+
+/** Stable actor per persona so view effects can depend on it without looping. */
 export function currentActor(persona: PersonaKey): Actor {
-  return actorFromPersona(persona);
+  const cached = actorCache.get(persona);
+  if (cached) return cached;
+  const actor = actorFromPersona(persona);
+  actorCache.set(persona, actor);
+  return actor;
 }
 
 export const PERSONA_LIST = Object.values(PERSONAS);
@@ -105,6 +112,7 @@ export const PERSONA_LIST = Object.values(PERSONAS);
 export function resetDemo(): void {
   started = false;
   toastId = 0;
+  actorCache.clear();
   useDemo.setState({
     platform: null,
     clock: null,

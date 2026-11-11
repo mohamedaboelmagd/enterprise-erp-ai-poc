@@ -25,7 +25,7 @@ export function FinanceView() {
       setRows(list);
       setSelected((cur) => cur ?? list[0]?.id ?? null);
     });
-  }, [platform, actor, tick]);
+  }, [platform, persona, tick]);
 
   const current = rows.find((r) => r.id === selected);
   const canWrite = actorCan(actor, "finance:write");

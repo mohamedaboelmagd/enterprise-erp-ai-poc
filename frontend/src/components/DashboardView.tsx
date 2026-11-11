@@ -15,15 +15,20 @@ export function DashboardView() {
 
   useEffect(() => {
     if (!platform || !clock) return;
+    const current = currentActor(persona);
     void (async () => {
       const today = clock.today();
-      const overdue = actorCan(actor, "finance:read") ? (await platform.finance.list(actor)).filter((i) => isOverdue(i, today)).length : 0;
-      const pendingInv = actorCan(actor, "finance:approve") ? (await platform.finance.list(actor, { status: "submitted" })).length : 0;
-      const pendingLeave = actorCan(actor, "hr:approve") ? (await platform.hr.list(actor, { status: "submitted" })).length : 0;
-      const openPo = actorCan(actor, "procurement:read") ? (await platform.procurement.list(actor)).filter(isOpenPo).length : 0;
-      setCounts({ overdue, pendingInv, pendingLeave, openPo });
+      const overdue = actorCan(current, "finance:read") ? (await platform.finance.list(current)).filter((i) => isOverdue(i, today)).length : 0;
+      const pendingInv = actorCan(current, "finance:approve") ? (await platform.finance.list(current, { status: "submitted" })).length : 0;
+      const pendingLeave = actorCan(current, "hr:approve") ? (await platform.hr.list(current, { status: "submitted" })).length : 0;
+      const openPo = actorCan(current, "procurement:read") ? (await platform.procurement.list(current)).filter(isOpenPo).length : 0;
+      setCounts((prev) =>
+        prev.overdue === overdue && prev.pendingInv === pendingInv && prev.pendingLeave === pendingLeave && prev.openPo === openPo
+          ? prev
+          : { overdue, pendingInv, pendingLeave, openPo },
+      );
     })();
-  }, [platform, actor, clock, tick]);
+  }, [platform, persona, clock, tick]);
 
   const cards = [
     actorCan(actor, "finance:read") && { id: "overdue", label: t.overdue, value: counts.overdue, tab: "finance" as const },
