@@ -27,6 +27,9 @@ jobs:
       - name: Prisma validate and generate
         run: npx prisma validate && npx prisma generate
         working-directory: backend
+        env:
+          # validate reads the datasource URL; no database is contacted
+          DATABASE_URL: postgresql://erp:erp@localhost:5432/enterprise_erp
       - name: Typecheck
         run: npm run typecheck --prefix backend && npm run typecheck --prefix frontend
       - name: Unit tests (domain, AI provider, authz)
