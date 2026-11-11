@@ -3,11 +3,20 @@
 import { create } from "zustand";
 import { createInMemoryPlatform, type Platform } from "@core/domain/platform";
 import { PERSONAS, actorFromPersona, seedDemo, type PersonaKey } from "@core/domain/seed";
+import { actorCan, type Permission } from "@core/domain/identity/permissions";
 import { FixedClock } from "@core/domain/shared/clock";
 import type { Actor } from "@core/domain/shared/actor";
 import type { Lang } from "../i18n/strings";
 
 export type Tab = "dashboard" | "finance" | "hr" | "procurement" | "audit" | "assistant";
+
+const TAB_PERMISSION: Partial<Record<Tab, Permission>> = {
+  finance: "finance:read",
+  hr: "hr:read",
+  procurement: "procurement:read",
+  audit: "audit:read",
+  assistant: "ai:use",
+};
 
 export interface Toast {
   kind: "ok" | "error";
@@ -56,7 +65,11 @@ export const useDemo = create<DemoState>((set, get) => ({
   },
 
   setPersona(persona) {
-    set({ persona, tick: get().tick + 1 });
+    const actor = currentActor(persona);
+    const currentTab = get().tab;
+    const needed = TAB_PERMISSION[currentTab];
+    const tab = needed && !actorCan(actor, needed) ? "dashboard" : currentTab;
+    set({ persona, tab, tick: get().tick + 1 });
   },
   setLang(lang) {
     set({ lang });

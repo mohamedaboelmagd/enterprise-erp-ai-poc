@@ -67,4 +67,15 @@ describe("demo shell", () => {
     financeList.mockRestore();
     hrList.mockRestore();
   });
+
+  it("drops an unauthorized tab when the persona changes so the view does not throw", async () => {
+    const user = userEvent.setup();
+    await ready();
+    await user.click(screen.getByTestId("tab-finance"));
+    await waitFor(() => expect(screen.getByTestId("invoice-INV-2026-0002")).toBeInTheDocument());
+    await user.selectOptions(screen.getByTestId("persona"), "lina");
+    await waitFor(() => expect(screen.getByTestId("tab-dashboard")).toHaveClass("active"));
+    expect(screen.queryByTestId("invoice-INV-2026-0002")).not.toBeInTheDocument();
+    expect(screen.getByTestId("tab-hr")).toBeInTheDocument();
+  });
 });
